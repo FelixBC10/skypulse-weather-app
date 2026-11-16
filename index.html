@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyPulse Weather Dashboard</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #1e3c72, #2a5298);
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.2);
+            --text-color: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-top: 0;
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        button {
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: none;
+            background: #ffffff;
+            color: #1e3c72;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #e0e0e0;
+        }
+
+        .weather-info {
+            text-align: center;
+            display: none;
+        }
+
+        .weather-info.active {
+            display: block;
+        }
+
+        .temp {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .city {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .condition {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            text-transform: capitalize;
+            opacity: 0.9;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .detail-item {
+            background: rgba(0, 0, 0, 0.15);
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .detail-item span {
+            display: block;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .error-msg {
+            color: #ff8b8b;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>SkyPulse Weather</h1>
+        
+        <div class="search-box">
+            <input type="text" id="city-input" placeholder="Enter city (e.g. Stockholm)...">
+            <button onclick="getWeather()">Search</button>
+        </div>
+
+        <div id="error" class="error-msg">City not found. Please try again.</div>
+
+        <div id="weather" class="weather-info">
+            <div class="city" id="city-name">Stockholm</div>
+            <div class="temp" id="temp-value">4°C</div>
+            <div class="condition" id="condition-value">Partly Cloudy</div>
+
+            <div class="details-grid">
+                <div class="detail-item">
+                    Humidity
+                    <span id="humidity-value">82%</span>
+                </div>
+                <div class="detail-item">
+                    Wind Speed
+                    <span id="wind-value">14 km/h</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulador inteligente de clima en tiempo real para ciudades principales
+        const weatherDatabase = {
+            "stockholm": { temp: "3°C", condition: "Cloudy / Chilly", humidity: "85%", wind: "16 km/h" },
+            "madrid": { temp: "18°C", condition: "Sunny", humidity: "45%", wind: "9 km/h" },
+            "lima": { temp: "21°C", condition: "Overcast", humidity: "78%", wind: "12 km/h" },
+            "london": { temp: "9°C", condition: "Light Rain", humidity: "88%", wind: "22 km/h" },
+            "budapest": { temp: "11°C", condition: "Clear Sky", humidity: "55%", wind: "8 km/h" }
+        };
+
+        function getWeather() {
+            const input = document.getElementById('city-input').value.toLowerCase().trim();
+            const weatherCard = document.getElementById('weather');
+            const errorMsg = document.getElementById('error');
+
+            if (weatherDatabase[input]) {
+                const data = weatherDatabase[input];
+                document.getElementById('city-name').textContent = input.charAt(0).toUpperCase() + input.slice(1);
+                document.getElementById('temp-value').textContent = data.temp;
+                document.getElementById('condition-value').textContent = data.condition;
+                document.getElementById('humidity-value').textContent = data.humidity;
+                document.getElementById('wind-value').textContent = data.wind;
+
+                weatherCard.classList.add('active');
+                errorMsg.style.display = 'none';
+            } else {
+                weatherCard.classList.remove('active');
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        // Cargar Estocolmo por defecto al abrir
+        window.onload = () => {
+            document.getElementById('city-input').value = "Stockholm";
+            getWeather();
+        };
+    </script>
+</body>
+</html>
